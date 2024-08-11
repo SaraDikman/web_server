@@ -15,8 +15,9 @@ RUN chown -R appuser:appgroup /usr/src/app
 # Switch to the new user
 USER appuser
 
-# Make port 80 available to the world outside this container
-EXPOSE 80
+# Make port 8080 available to the world outside this container
+EXPOSE 8080
 
 # Run the application
 CMD ["python", "app.py"]
+
