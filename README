@@ -1,0 +1,45 @@
+1. Create Web-Server that dispay “Welcome”  
+
+Create python app-> app.py:
+
+    import http.server
+    import socketserver
+    PORT = 80
+    class MyHandler(http.server.SimpleHTTPRequestHandler):
+        def do_GET(self):
+            self.send_response(200)
+            self.send_header("Content-type", "text/html")
+            self.end_headers()
+            self.wfile.write(b"<!DOCTYPE html><html><head><title>Welcome</title></head><body><h1>Welcome</h1></body></html>")
+    with socketserver.TCPServer(("", PORT), MyHandler) as httpd:
+        print("Serving at port", PORT)
+        httpd.serve_forever()
+
+2. Create Rootless Image
+update Dockerfile that run without root user:
+Dockerfile:
+    FROM python:3.9-slim
+    # Set the working directory
+    WORKDIR /app
+    # Copy the current directory contents into the container at /app
+    COPY . /app
+    # Create a non-root user and group, and set the appropriate permissions
+    RUN groupadd -r appuser && useradd -r -g appuser appuser
+    # Change ownership of the directory to the non-root user
+    RUN chown -R appuser:appuser /app
+    # Switch to the non-root user
+    USER appuser
+    # Make port 80 available to the world outside this container
+    EXPOSE 80
+    # Run app.py when the container launches
+    CMD ["python", "app.py"]
+
+3. Updating the page without rebuilding the container
+    To update the page without building the container, we will use volume which allows us to update the local files.
+    Running the container with volume:
+    docker run -it -p 80:80 -v C:\Users\hp\Learnning\interview\web_server:/app my_web_server
+    This way, any changes you make to local files will be automatically updated in the container.
+    Summary
+    1. Creating a web server that displays a custom welcome page.
+    2. Creating a rootless image.
+    Updating the page without rebuilding the container using volume.
